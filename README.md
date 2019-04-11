@@ -563,7 +563,7 @@ var myGreatMixin = {
 ```
 
 # 特别说明
-## 注释
+## 1.注释
 建议使用VscCode插件koroFileHeader
 自动生成文件注释头
 ```
@@ -576,6 +576,6 @@ var myGreatMixin = {
  */
 ```
 
-## 严禁在框架内使用jQuery!!!!!
+## 2.严禁在框架内使用jQuery!!!!!
 
-## 前端代码编辑器建议使用VsCode或者能使用Eslint编辑器,推荐Eslint结合Prettier
+## 3.前端代码编辑器建议使用VsCode或者能使用Eslint编辑器,推荐Eslint结合Prettier
