@@ -1,9 +1,10 @@
 ## 目录
 1. [HTML](#HTML)
 1. [CSS](#css)
-2. [ES5](#es5)
-3. [ES6](#es6)
-4. [特别说明](#特别说明)
+1. [ES5](#es5)
+1. [ES6](#es6)
+1. [Vue](#vue)
+1. [特别说明](#特别说明)
 # HTML
 
 ## 页面语言LANG
@@ -480,6 +481,84 @@ if (name !== '') {
 }
 if (collection.length > 0) {
   // ...stuff...
+}
+```
+
+# vue
+## - 组件名为多个单词
+这样避免与html冲突
+## - props尽量详细,最好指定默认类型
+## - v-for设置键
+## - v-for 和v-if不要放在一起使用
+## - 组件样式设置作用域 scoped
+## - 模板下的简单的表达式
+> 推荐
+```
+!-- 在模板中 -->
+{{ normalizedFullName }}
+// 复杂表达式已经移入一个计算属性
+computed: {
+  normalizedFullName: function () {
+    return this.fullName.split(' ').map(function (word) {
+      return word[0].toUpperCase() + word.slice(1)
+    }).join(' ')
+  }
+}
+```
+> 不推荐
+```
+{{
+  fullName.split(' ').map(function (word) {
+    return word[0].toUpperCase() + word.slice(1)
+  }).join(' ')
+}}
+```
+## - 私有属性
+在插件、混入等扩展中始终为自定义的私有属性使用 $_ 前缀。并附带一个命名空间以回避和其它作者的冲突 (比如 $_yourPluginName_)。
+> 推荐
+```
+var myGreatMixin = {
+  // ...
+  methods: {
+    $_myGreatMixin_update: function () {
+      // ...
+    }
+  }
+}
+```
+> 不推荐
+```
+var myGreatMixin = {
+  // ...
+  methods: {
+    update: function () {
+      // ...
+    }
+  }
+}
+var myGreatMixin = {
+  // ...
+  methods: {
+    _update: function () {
+      // ...
+    }
+  }
+}
+var myGreatMixin = {
+  // ...
+  methods: {
+    $update: function () {
+      // ...
+    }
+  }
+}
+var myGreatMixin = {
+  // ...
+  methods: {
+    $_update: function () {
+      // ...
+    }
+  }
 }
 ```
 
