@@ -3,6 +3,7 @@
 1. [CSS](#css)
 2. [ES5](#es5)
 3. [ES6](#es6)
+4. [特别说明](#特别说明)
 # HTML
 
 ## 页面语言LANG
@@ -490,3 +491,20 @@ if (collection.length > 0) {
 }
 ```
 
+# 特别说明
+## 注释
+建议使用VscCode插件koroFileHeader
+自动生成文件注释头
+```
+/*
+ * @Author: wangzhongjie
+ * @LastEditors: wangzhongjie
+ * @Description: 复用路由
+ * @Date: 2019-04-11 11:06:25
+ * @LastEditTime: 2019-04-11 14:06:44
+ */
+```
+
+## 严禁在框架内使用jQuery!!!!!
+
+## 前端代码编辑器建议使用VsCode或者能使用Eslint编辑器,推荐Eslint结合Prettier
