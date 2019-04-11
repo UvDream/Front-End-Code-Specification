@@ -149,8 +149,6 @@ TML文本、CDATA、JavaScript、meta标签某些属性等内容可大小写混�
 - 尽量少用通用选择器 *
 - 不使用 ID 选择器
 - 不使用无具体语义定义的标签选择器
-
-
 # CSS
 - ## 代码需要格式化后提交
 - ## Css代码禁止大写
@@ -183,7 +181,6 @@ TML文本、CDATA、JavaScript、meta标签某些属性等内容可大小写混�
     margin: 0px 10px;
 }
 ```
-- ## 属性值在引用的时候统一使用单引号
 
 # ES5
 ## 命名规范
@@ -348,7 +345,6 @@ class PeekableQueue extends Queue {
 ```
 > 不推荐
 ```
-
 inherits(PeekableQueue, Queue);
 PeekableQueue.prototype.peek = function() {
   return this._queue[0];
@@ -370,7 +366,6 @@ class Jedi {
 }
 
 const luke = new Jedi();
-
 luke.jump()
   .setHeight(20);
 ```
@@ -380,11 +375,9 @@ Jedi.prototype.jump = function() {
   this.jumping = true;
   return true;
 };
-
 Jedi.prototype.setHeight = function(height) {
   this.height = height;
 };
-
 const luke = new Jedi();
 luke.jump(); // => true
 luke.setHeight(20); // => undefined
@@ -456,7 +449,6 @@ const luke = {
   jedi: true,
   age: 28,
 };
-
 function getProp(prop) {
   return luke[prop];
 }
