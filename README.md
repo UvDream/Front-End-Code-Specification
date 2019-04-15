@@ -78,18 +78,6 @@ TML文本、CDATA、JavaScript、meta标签某些属性等内容可大小写混�
 ...
 ]]></script>
 ```
-## 类型属性
-不需要为css丶js指定类型属性,HTML5中默认包含了
-> 推荐
-```
-<link rel="stylesheet" href="" >
-<script src=""></script>
-```
-> 不推荐 
-```
-<link rel="stylesheet" type="text/css" href="" >
-<script type="text/javascript" src="" ></script>
-```
 ## 元素属性
 - 元素属性值使用双引号语法
 - 元素属性值可以写上的都写上
@@ -114,26 +102,6 @@ TML文本、CDATA、JavaScript、meta标签某些属性等内容可大小写混�
 > 不推荐 
 ```
 <a href="#">more>></a>
-```
-## 代码缩进
-元素嵌套规范，每个块状元素独立一行，内联元素可选
-> 推荐
-```
-<div>
-    <h1></h1>
-    <p></p>
-</div>       
-<p><span></span><span></span></p>
-```
-> 不推荐
-```
-<div>
-    <h1></h1><p></p>
-</div>       
-<p>
-    <span></span>
-    <span></span>
-</p>
 ```
 ## 段落元素与标题元素只能嵌套内联元素
 > 推荐
