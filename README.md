@@ -1,4 +1,5 @@
 ## 目录
+
 1. [HTML](#HTML)
 1. [CSS](#css)
 1. [ES5](#es5)
@@ -8,6 +9,7 @@
 # HTML
 
 ## 页面语言LANG
+
  推荐使用属性值cmn-Hans-CN(简体,中国大陆),但是考虑浏览器和操作系统的兼容性,目前仍然使用zh-CN
  ```
 <html lang=”zh-CN”>
@@ -453,49 +455,239 @@ if (collection.length > 0) {
 ```
 
 # vue
-## - 组件名为多个单词
-这样避免与html冲突
-## - props尽量详细,最好指定默认类型
-## - v-for设置键
-## - v-for 和v-if不要放在一起使用
-## - 组件样式设置作用域 scoped
-## - 模板下的简单的表达式
+
+## 组件名为多个单词
+
+组件名应该为多个单词,根组件App除外
+
 > 推荐
+
+```vue
+export default {
+  name: 'TodoList',
+  // ...
+}
 ```
-!-- 在模板中 -->
-{{ normalizedFullName }}
-// 复杂表达式已经移入一个计算属性
-computed: {
-  normalizedFullName: function () {
-    return this.fullName.split(' ').map(function (word) {
-      return word[0].toUpperCase() + word.slice(1)
-    }).join(' ')
+
+> 不推荐
+
+```vue
+export default {
+  name: 'Todo',
+  // ...
+}
+```
+
+## 组件数据
+
+组件data必须一个函数
+
+当在组件中使用data属性的时候(除了new Vue外的任何地方),他的值必须是返回一个对象的函数
+
+> 推荐
+
+```vue
+// In a .vue file
+export default {
+  data () {
+    return {
+      foo: 'bar'
+    }
+  }
+}
+// 在一个 Vue 的根实例上直接使用对象是可以的，
+// 因为只存在一个这样的实例。
+new Vue({
+  data: {
+    foo: 'bar'
+  }
+})
+```
+
+> 不推荐
+
+```vue
+export default {
+  data: {
+    foo: 'bar'
   }
 }
 ```
-> 不推荐
-```
-{{
-  fullName.split(' ').map(function (word) {
-    return word[0].toUpperCase() + word.slice(1)
-  }).join(' ')
-}}
-```
-## - 私有属性
-在插件、混入等扩展中始终为自定义的私有属性使用 $_ 前缀。并附带一个命名空间以回避和其它作者的冲突 (比如 $_yourPluginName_)。
+
+## Prop定义
+
+Prop定义应该尽量详细,至少需要指定其类型
+
 > 推荐
-```
-var myGreatMixin = {
-  // ...
-  methods: {
-    $_myGreatMixin_update: function () {
-      // ...
+
+```vue
+props: {
+  status: String
+}
+// 更好的做法！
+props: {
+  status: {
+    type: String,
+    required: true,
+    validator: function (value) {
+      return [
+        'syncing',
+        'synced',
+        'version-conflict',
+        'error'
+      ].indexOf(value) !== -1
     }
   }
 }
 ```
+
 > 不推荐
+
+```vue
+// 这样做只有开发原型系统时可以接受
+props: ['status']
 ```
+
+## 为v-for设置键
+
+总是用key配合v-for使用
+
+> 推荐
+
+```vue
+<ul>
+  <li
+    v-for="todo in todos"
+    :key="todo.id"
+  >
+    {{ todo.text }}
+  </li>
+</ul>
+```
+
+> 不推荐
+
+```vue
+<ul>
+  <li v-for="todo in todos">
+    {{ todo.text }}
+  </li>
+</ul>
+```
+
+
+
+## 避免v-if和v-for一起使用
+
+永远不要把 v-if 和 v-for 同时用在同一个元素上。
+ 一般我们在两种常见的情况下会倾向于这样做：
+
+- 为了过滤一个列表中的项目 (比如 v-for="user in users" v-if="user.isActive")。在这种情形下，请将 users 替换为一个计算属性 (比如 activeUsers)，让其返回过滤后的列表。
+- 为了避免渲染本应该被隐藏的列表 (比如 v-for="user in users" v-if="shouldShowUsers")。这种情形下，请将 v-if 移动至容器元素上 (比如 ul, ol)。
+
+> 推荐
+
+```vue
+<ul v-if="shouldShowUsers">
+  <li
+    v-for="user in users"
+    :key="user.id"
+  >
+    {{ user.name }}
+  </li>
+</ul>
+```
+
+> 不推荐
+
+```vue
+<ul>
+  <li
+    v-for="user in users"
+    v-if="user.isActive"
+    :key="user.id"
+  >
+    {{ user.name }}
+  </li>
+</ul>
+```
+
+## 为组件的样式设置作用域
+
+对于应用来说，顶级 App 组件和布局组件中的样式可以是全局的，但是其它所有组件都应该是有作用域的。
+ 这条规则只和单文件组件有关。你不一定要使用 scoped 特性。设置作用域也可以通过 CSS Modules，那是一个基于 class 的类似 BEM 的策略，当然你也可以使用其它的库或约定。
+
+ 不管怎样，对于组件库，我们应该更倾向于选用基于 class 的策略而不是 scoped 特性。
+
+ 这让覆写内部样式更容易：使用了常人可理解的 class 名称且没有太高的选择器优先级，而且不太会导致冲突。
+
+> 推荐
+
+```vue
+<template>
+  <button class="c-Button c-Button--close">X</button>
+</template>
+
+<style scoped>
+.c-Button {
+  border: none;
+  border-radius: 2px;
+}
+
+.c-Button--close {
+  background-color: red;
+}
+</style>
+ 
+```
+
+> 不推荐
+
+```vue
+<template>
+  <button class="btn btn-close">X</button>
+</template>
+
+<style>
+.btn-close {
+  background-color: red;
+}
+</style>
+```
+
+## 私有属性名
+
+**使用模块作用域保持不允许外部访问的函数的私有性。如果无法做到这一点，就始终为插件、混入等不考虑作为对外公共 API 的自定义私有属性使用 `$_` 前缀。并附带一个命名空间以回避和其它作者的冲突 (比如 `$_yourPluginName_`)。**
+
+Vue 使用 `_` 前缀来定义其自身的私有属性，所以使用相同的前缀 (比如 `_update`) 有覆写实例属性的风险。即便你检查确认 Vue 当前版本没有用到这个属性名，也不能保证和将来的版本没有冲突。
+
+对于 `$` 前缀来说，其在 Vue 生态系统中的目的是暴露给用户的一个特殊的实例属性，所以把它用于*私有*属性并不合适。
+
+不过，我们推荐把这两个前缀结合为 `$_`，作为一个用户定义的私有属性的约定，以确保不会和 Vue 自身相冲突。
+
+> 推荐
+
+```vue
+var myGreatMixin = {
+  // ...
+  methods: {
+    publicMethod() {
+      // ...
+      myPrivateFunction()
+    }
+  }
+}
+
+function myPrivateFunction() {
+  // ...
+}
+
+export default myGreatMixin
+```
+
+> 不推荐
+
+```vue
 var myGreatMixin = {
   // ...
   methods: {
@@ -530,20 +722,3 @@ var myGreatMixin = {
 }
 ```
 
-# 特别说明
-## 1.注释
-建议使用VscCode插件koroFileHeader
-自动生成文件注释头
-```
-/*
- * @Author: wangzhongjie
- * @LastEditors: wangzhongjie
- * @Description: 复用路由
- * @Date: 2019-04-11 11:06:25
- * @LastEditTime: 2019-04-11 14:06:44
- */
-```
-
-## 2.严禁在框架内使用jQuery!!!!!
-
-## 3.前端代码编辑器建议使用VsCode或者能使用Eslint编辑器,推荐Eslint结合Prettier

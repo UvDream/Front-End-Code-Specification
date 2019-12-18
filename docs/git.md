@@ -1,134 +1,113 @@
-### 1.全局安装commitizen & cz-conventional-changelog
+## vue-cli-plugin-commitlint 介绍
 
-`commitizen`是一个撰写合格`commit message`的工具，用于代替`git commit` 指令，而`cz-conventional-changelog`适配器提供[conventional-changelog](https://github.com/conventional-changelog/conventional-changelog)标准（约定式提交标准）。基于不同需求，也可以使用不同适配器。
+`vue-cli-plugin-commitlint` 是根据 vue 插件的形式写的，可以执行 `vue add commitlint` 直接使用，如果不是 vue 的项目也可以根据下面的配置自行配置。
 
-```
-npm install -g commitizen cz-conventional-changelog
-echo '{ "path": "cz-conventional-changelog" }' > ~/.czrc
-```
+结合 `commitizen` `commitlint` `conventional-changelog-cli` `husky` `conventional-changelog-angular`，进行封装，一键安装，开箱即用的代码提交规范。
 
-安装完毕后，可直接使用`git cz`来取代`git commit`。
+## 功能
 
-全局模式下，需要 `~/.czrc` 配置文件, 为`commitizen`指定`Adapter`。
+1. 自动检测 commit 是否规范，不规范不允许提交
+2. 自动提示 commit 填写格式。不怕忘记规范怎么写
+3. 集成 git add . && git commit 不需要在执行两个命令
+4. 自动生成 changelog
 
-### 2. 项目内安装commitlint & husky
+## 配置
 
-`commitlint`负责用于对`commit message`进行格式校验，`husky`负责提供更易用的`git hook`。
-
-```
-Use npm
-npm i -D husky @commitlint/config-conventional @commitlint/cli
-Use yarn
-yarn add husky @commitlint/config-conventional @commitlint/cli -D
-```
-
-`commitlint`只能做格式规范，无法触及内容。对于内容质量的把控只能靠我们自己。
-
-### 3. 添加相应配置
-
-创建`commitlint.config.js`
+1. 如果您是 vue-cli3 的项目可以直接使用即可
 
 ```
-# In the same path as package.json
-
-echo 'module.exports = {extends: ["@commitlint/config-conventional"]};' > ./commitlint.config.js
+vue add commitlint
+复制代码
 ```
 
-引入`husky`
+1. 如果您不是 vue-cli3 的项目
 
 ```
-# package.json
+npm i vue-cli-plugin-commitlint commitizen commitlint conventional-changelog-cli husky -D
+复制代码
+```
 
-...,
-"husky": {
+- 在 package.json 中添加
+
+```
+{
+  "scripts": {
+    "log": "conventional-changelog --config ./node_modules/vue-cli-plugin-commitlint/lib/log -i CHANGELOG.md -s -r 0",
+    "cz": "npm run log && git add . && git cz"
+  },
+  "husky": {
     "hooks": {
-      "commit-msg": "commitlint -e $GIT_PARAMS"
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/vue-cli-plugin-commitlint/lib/cz"
+    }
+  }
 }
+复制代码
 ```
 
-### 4. 使用
-
-执行`git cz`进入interactive模式，根据提示依次填写
+增加 commitlint.config.js 文件
 
 ```
-1.Select the type of change that you're committing 选择改动类型 (<type>)
-
-2.What is the scope of this change (e.g. component or file name)? 填写改动范围 (<scope>)
-
-3.Write a short, imperative tense description of the change: 写一个精简的描述 (<subject>)
-
-4.Provide a longer description of the change: (press enter to skip) 对于改动写一段长描述 (<body>)
-
-5.Are there any breaking changes? (y/n) 是破坏性修改吗？默认n (<footer>)
-
-6.Does this change affect any openreve issues? (y/n) 改动修复了哪个问题？默认n (<footer>)
+module.exports = {
+  extends: ['./node_modules/vue-cli-plugin-commitlint/lib/lint']
+};
+复制代码
 ```
 
-生成的commit message格式如下：
+## 使用
 
 ```
-<type>(<scope>): <subject>
-<BLANK LINE>
-<body>
-<BLANK LINE>
-<footer>
+npm run cz  # git add . && git commit -m 'feat:(xxx): xxx'
+npm run log # 生成 CHANGELOG
+复制代码
 ```
 
-填写完毕后，`husky`会调用`commitlint`对message进行格式校验，默认规定`type`及`subject`为必填项。
+1. 代码提交 npm run cz
 
-任何`git commit`指令的`option`都能用在 `git cz`指令上, 例如`git cz -a`
 
-## Commit message规范在rrd-fe落地使用情况
 
-针对团队目前使用的情况，我们讨论后拟定了`commit message`每一部分的填写规则。
+![img](https://user-gold-cdn.xitu.io/2019/11/26/16ea5437d5810978?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
 
-### 1. type
 
-`type`为必填项，用于指定commit的类型，约定了`feat`、`fix`两个`主要type`，以及docs、style、build、refactor、revert五个`特殊type`，`其余type`暂不使用。
 
-```
-# 主要type
-feat:     增加新功能
-fix:      修复bug
+1. 选择一个类型会自动询问
+   1. (非必填）本次提交的改变所影响的范围
+   2. (必填）写一个简短的变化描述
+   3. (非必填）提供更详细的变更描述
+   4. (非必填)是否存在不兼容变更?
+   5. (非必填)此次变更是否影响某些打开的 issue
 
-# 特殊type
-docs:     只改动了文档相关的内容
-style:    不影响代码含义的改动，例如去掉空格、改变缩进、增删分号
-build:    构造工具的或者外部依赖的改动，例如webpack，npm
-refactor: 代码重构时使用
-revert:   执行git revert打印的message
 
-# 暂不使用type
-test:     添加测试或者修改现有测试
-perf:     提高性能的改动
-ci:       与CI（持续集成服务）有关的改动
-chore:    不修改src或者test的其余修改，例如构建过程或辅助工具的变动
-```
 
-当一次改动包括`主要type`与`特殊type`时，统一采用`主要type`。
+![img](https://user-gold-cdn.xitu.io/2019/11/26/16ea543bc1af2c9e?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
 
-### 2. scope
 
-`scope`也为必填项，用于描述改动的范围，格式为项目名/模块名，例如： `node-pc/common` `rrd-h5/activity`，而`we-sdk`不需指定模块名。如果一次commit修改多个模块，建议拆分成多次commit，以便更好追踪和维护。
 
-### 3. body
+### changelog 演示
 
-`body`填写详细描述，主要描述`改动之前的情况`及`修改动机`，对于小的修改不作要求，但是重大需求、更新等必须添加body来作说明。
 
-### 4. break changes
 
-`break changes`指明是否产生了破坏性修改，涉及break changes的改动必须指明该项，类似版本升级、接口参数减少、接口删除、迁移等。
+![img](https://user-gold-cdn.xitu.io/2019/11/26/16ea543f4b413652?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
 
-### 5. affect issues
 
-`affect issues`指明是否影响了某个问题。例如我们使用jira时，我们在`commit message`中可以填写其影响的`JIRA_ID`，若要开启该功能需要先打通`jira`与`gitlab`。参考文档：[docs.gitlab.com/ee/user/pro…](https://docs.gitlab.com/ee/user/project/integrations/jira.html)
 
-填写方式例如：
+## 规则
 
-```
-re #JIRA_ID
-fix #JIRA_ID
-```
+| 规范名   | 描述                                                    |
+| -------- | ------------------------------------------------------- |
+| docs     | 仅仅修改了文档，比如 README, CHANGELOG, CONTRIBUTE 等等 |
+| chore    | 改变构建流程、或者增加依赖库、工具等                    |
+| feat     | 新增 feature                                            |
+| fix      | 修复 bug                                                |
+| merge    | 合并分支                                                |
+| perf     | 优化相关，比如提升性能、体验                            |
+| refactor | 代码重构，没有加新功能或者修复 bug                      |
+| revert   | 回滚到上一个版本                                        |
+| style    | 仅仅修改了空格、格式缩进、都好等等，不改变代码逻辑      |
+| test     | 测试用例，包括单元测试、集成测试等                      |
 
 
